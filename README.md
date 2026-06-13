@@ -1,6 +1,6 @@
 # Unit Conversion API
 
-A production-quality ASP.NET Core Web API for converting numerical values between units of measurement across length, weight/mass, and temperature categories.
+A production-quality ASP.NET Core Web API for converting numerical values between units of measurement across length, weight/mass, temperature, and volume categories.
 
 ## Project Overview
 
@@ -10,6 +10,7 @@ Supported categories:
 - **Length** - meter, kilometer, centimeter, millimeter, foot, inch, yard, mile
 - **Weight/Mass** - kilogram, gram, milligram, pound, ounce
 - **Temperature** - celsius, fahrenheit, kelvin
+- **Volume** - litre, millilitre, gallon, cup, fluid ounce
 
 ## Architecture
 
@@ -35,13 +36,13 @@ UnitConversion.sln
 ## Design Decisions
 
 ### Base-unit conversion pattern
-Linear categories (length, weight) use a **factor-to-base-unit** approach. Each unit stores a single multiplication factor relative to the base unit (meter for length, kilogram for weight). Converting A to B is: `result = value * (factorA / factorB)`. Adding a new unit requires a single dictionary entry.
+Linear categories (length, weight, volume) use a **factor-to-base-unit** approach. Each unit stores a single multiplication factor relative to the base unit (meter for length, kilogram for weight, litre for volume). Converting A to B is: `result = value * (factorA / factorB)`. Adding a new unit requires a single dictionary entry.
 
 ### Temperature as a special case
 Temperature conversions involve offsets (not just scaling), so a dedicated `TemperatureUnitConverter` uses formula-based conversion through Kelvin as an intermediate.
 
 ### Registry-based extensibility
-All converters implement `IUnitConverter` and are registered via DI. Adding a new category (e.g., volume, speed) means creating one new converter instance and registering it -- no existing code changes required.
+All converters implement `IUnitConverter` and are registered via DI. Adding a new category (e.g., speed, area) means creating one new converter instance and registering it -- no existing code changes required.
 
 ### Global exception middleware
 Domain exceptions (`UnitNotFoundException`, `UnsupportedConversionException`) are caught by middleware and translated into consistent `ApiErrorResponse` JSON. This keeps controllers thin and error handling centralized.
@@ -137,7 +138,8 @@ Returns all supported units grouped by category.
 {
   "Length": ["meter", "kilometer", "centimeter", "millimeter", "foot", "inch", "yard", "mile"],
   "Weight": ["kilogram", "gram", "milligram", "pound", "ounce"],
-  "Temperature": ["celsius", "fahrenheit", "kelvin"]
+  "Temperature": ["celsius", "fahrenheit", "kelvin"],
+  "Volume": ["litre", "millilitre", "gallon", "cup", "fluidounce"]
 }
 ```
 
@@ -146,7 +148,7 @@ Returns all supported units grouped by category.
 - **Database-backed unit registry** - Persist units and factors in a database so new units can be added at runtime without redeployment.
 - **Batch conversions** - Accept an array of conversion requests in a single API call.
 - **Conversion history** - Store past conversions for analytics.
-- **Additional categories** - Volume, speed, area, data storage, time.
+- **Additional categories** - Speed, area, data storage, time.
 - **Unit aliases** - Support shorthand names (e.g., "m" for "meter", "kg" for "kilogram").
 - **Localization** - Return unit names in different languages.
 - **Rate limiting** - Protect the API from excessive usage.

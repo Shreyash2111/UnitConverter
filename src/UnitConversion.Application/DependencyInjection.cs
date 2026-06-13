@@ -66,11 +66,14 @@ public static class DependencyInjection
 
     private static LinearUnitConverter CreateVolumeConverter()
     {
+        // Each factor represents how many litres one unit equals.
         var factors = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
         {
             ["litre"] = 1.0,
-            ["mililitre"] = 0.001,
-            ["gallon"] = 3.78
+            ["millilitre"] = 0.001,
+            ["gallon"] = 3.785411784,
+            ["cup"] = 0.236588,
+            ["fluidounce"] = 0.0295735,
         };
         return new LinearUnitConverter(ConversionCategory.Volume, factors);
     }

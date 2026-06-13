@@ -14,5 +14,6 @@ public enum ConversionCategory
     /// <summary>Temperature units (celsius, fahrenheit, kelvin).</summary>
     Temperature,
 
+    /// <summary>Volume units (litre, gallon, cup, etc.).</summary>
     Volume
 }
